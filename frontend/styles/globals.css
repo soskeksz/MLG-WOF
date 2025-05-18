@@ -1,0 +1,84 @@
+html,
+body {
+  padding: 0;
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
+    Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* MLG Rainbow effect */
+.rainbow-background {
+  animation: rainbow-flash 0.5s linear infinite;
+}
+
+@keyframes rainbow-flash {
+  0% { background-color: #ff0000; }
+  16% { background-color: #ff7f00; }
+  33% { background-color: #ffff00; }
+  50% { background-color: #00ff00; }
+  66% { background-color: #0000ff; }
+  83% { background-color: #9400d3; }
+  100% { background-color: #ff0000; }
+}
+
+/* Hitmarker styling */
+.hitmarker {
+  position: absolute;
+  width: 30px;
+  height: 30px;
+  z-index: 1000;
+  pointer-events: none;
+}
+
+/* Wasted effect (GTA style) */
+.wasted-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.wasted-text {
+  font-family: "Pricedown", Arial, sans-serif;
+  font-size: 120px;
+  color: #ff0000;
+  text-transform: uppercase;
+  animation: wasted-fade 3s forwards;
+}
+
+@keyframes wasted-fade {
+  0% { opacity: 0; transform: scale(0.8); }
+  20% { opacity: 1; transform: scale(1); }
+  80% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(1.2); }
+}
+
+/* Loading and error states */
+.loading, .error {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  font-size: 1.5rem;
+  color: white;
+  background: linear-gradient(to bottom, #000000, #434343);
+}
+
+.error {
+  color: #ff0000;
+}

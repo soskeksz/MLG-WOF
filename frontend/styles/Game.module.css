@@ -1,0 +1,461 @@
+.container {
+  min-height: 100vh;
+  padding: 0 0.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(to bottom, #000000, #434343);
+  color: white;
+  position: relative;
+  overflow: hidden;
+}
+
+.rainbowBackground {
+  animation: rainbow-flash 0.5s linear infinite;
+}
+
+@keyframes rainbow-flash {
+  0% { background-color: rgba(255, 0, 0, 0.8); }
+  16% { background-color: rgba(255, 127, 0, 0.8); }
+  33% { background-color: rgba(255, 255, 0, 0.8); }
+  50% { background-color: rgba(0, 255, 0, 0.8); }
+  66% { background-color: rgba(0, 0, 255, 0.8); }
+  83% { background-color: rgba(148, 0, 211, 0.8); }
+  100% { background-color: rgba(255, 0, 0, 0.8); }
+}
+
+.main {
+  padding: 2rem 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  max-width: 1200px;
+  width: 100%;
+}
+
+.title {
+  margin: 0;
+  line-height: 1.15;
+  font-size: 3rem;
+  text-align: center;
+  color: #ff00ff;
+  text-shadow: 3px 3px 0 #00ff00, -3px -3px 0 #0000ff;
+  animation: rainbow 5s infinite;
+  margin-bottom: 2rem;
+}
+
+@keyframes rainbow {
+  0% { color: #ff0000; }
+  14% { color: #ff7f00; }
+  28% { color: #ffff00; }
+  42% { color: #00ff00; }
+  57% { color: #0000ff; }
+  71% { color: #4b0082; }
+  85% { color: #9400d3; }
+  100% { color: #ff0000; }
+}
+
+.userInfo {
+  display: flex;
+  gap: 2rem;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.userInfo h2 {
+  margin: 0;
+  font-size: 1.2rem;
+  color: #00ff00;
+  background: rgba(0, 0, 0, 0.7);
+  padding: 0.5rem 1rem;
+  border-radius: 5px;
+  border: 2px solid #ff00ff;
+}
+
+.gameContainer {
+  display: flex;
+  gap: 3rem;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.bettingForm {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  align-items: center;
+}
+
+.bettingForm h3 {
+  margin: 0;
+  color: #00ff00;
+  font-size: 1.5rem;
+}
+
+.betInput {
+  padding: 0.5rem;
+  border: 2px solid #00ff00;
+  border-radius: 5px;
+  background-color: #000;
+  color: #fff;
+  font-size: 1.2rem;
+  width: 150px;
+  text-align: center;
+}
+
+.spinButton {
+  padding: 1rem 2rem;
+  background-color: #ff00ff;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  font-size: 1.2rem;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.2s;
+  text-transform: uppercase;
+}
+
+.spinButton:hover {
+  background-color: #cc00cc;
+  transform: scale(1.05);
+}
+
+.spinButton:active {
+  transform: scale(0.95);
+}
+
+.spinButton:disabled {
+  background-color: #666;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.wheelContainer {
+  position: relative;
+  width: 300px;
+  height: 300px;
+}
+
+.wheel {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  position: relative;
+  overflow: hidden;
+  border: 5px solid #fff;
+  transition: transform 3s cubic-bezier(0.25, 0.1, 0.25, 1);
+  display: flex;
+  flex-direction: column;
+}
+
+.wheelSection {
+  position: absolute;
+  width: 100%;
+  height: 50%;
+  transform-origin: 50% 100%;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 0.9rem;
+  color: white;
+  text-shadow: 1px 1px 2px black;
+  padding-top: 20px;
+}
+
+.wheelSection:nth-child(1) {
+  background-color: #ff0000;
+  transform: rotate(0deg);
+}
+
+.wheelSection:nth-child(2) {
+  background-color: #00ff00;
+  transform: rotate(60deg);
+}
+
+.wheelSection:nth-child(3) {
+  background-color: #0000ff;
+  transform: rotate(120deg);
+}
+
+.wheelSection:nth-child(4) {
+  background-color: #ffff00;
+  transform: rotate(180deg);
+}
+
+.wheelSection:nth-child(5) {
+  background-color: #ff00ff;
+  transform: rotate(240deg);
+}
+
+.wheelSection:nth-child(6) {
+  background-color: #00ffff;
+  transform: rotate(300deg);
+}
+
+.wheelPointer {
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 2rem;
+  color: #fff;
+  z-index: 10;
+}
+
+.result {
+  text-align: center;
+  padding: 1rem;
+  border-radius: 10px;
+  margin-bottom: 1rem;
+  animation: pulse 1s ease-in-out;
+  position: relative;
+}
+
+.result.double {
+  background-color: rgba(0, 255, 0, 0.3);
+  border: 2px solid #00ff00;
+}
+
+.result.keep {
+  background-color: rgba(255, 255, 0, 0.3);
+  border: 2px solid #ffff00;
+}
+
+.result.bankrupt {
+  background-color: rgba(255, 0, 0, 0.3);
+  border: 2px solid #ff0000;
+}
+
+.result h2 {
+  margin: 0;
+  font-size: 2rem;
+  text-transform: uppercase;
+}
+
+@keyframes pulse {
+  0% { transform: scale(0.8); opacity: 0; }
+  50% { transform: scale(1.1); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.mlgOverlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 100;
+}
+
+.navigation {
+  margin-top: 2rem;
+  display: flex;
+  gap: 1rem;
+}
+
+.leaderboardButton {
+  padding: 0.75rem 1.5rem;
+  background-color: #00ff00;
+  color: #000;
+  border: none;
+  border-radius: 5px;
+  text-decoration: none;
+  font-weight: bold;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.leaderboardButton:hover {
+  background-color: #00cc00;
+  transform: scale(1.05);
+}
+
+.homeButton {
+  padding: 0.75rem 1.5rem;
+  background-color: #ff00ff;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  text-decoration: none;
+  font-weight: bold;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.homeButton:hover {
+  background-color: #cc00cc;
+  transform: scale(1.05);
+}
+
+/* Hitmarker styles */
+.hitmarker {
+  position: absolute;
+  width: 30px;
+  height: 30px;
+  z-index: 1000;
+  pointer-events: none;
+}
+
+.cssHitmarker {
+  width: 30px;
+  height: 30px;
+  position: relative;
+  display: inline-block;
+}
+
+.cssHitmarker::before,
+.cssHitmarker::after {
+  content: '';
+  position: absolute;
+  background-color: white;
+}
+
+.cssHitmarker::before {
+  width: 100%;
+  height: 2px;
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%);
+}
+
+.cssHitmarker::after {
+  width: 2px;
+  height: 100%;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* Wasted effect */
+.wastedOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.wastedText {
+  font-family: "Pricedown", Arial, sans-serif;
+  font-size: 120px;
+  color: #ff0000;
+  text-transform: uppercase;
+  animation: wasted-fade 3s forwards;
+}
+
+@keyframes wasted-fade {
+  0% { opacity: 0; transform: scale(0.8); }
+  20% { opacity: 1; transform: scale(1); }
+  80% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(1.2); }
+}
+
+/* Loading and error states */
+.loading, .error {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  font-size: 1.5rem;
+  color: white;
+  background: linear-gradient(to bottom, #000000, #434343);
+}
+
+.error {
+  color: #ff0000;
+}
+
+@media (max-width: 768px) {
+  .gameContainer {
+    flex-direction: column;
+    gap: 2rem;
+  }
+  
+  .wheelContainer {
+    width: 250px;
+    height: 250px;
+  }
+  
+  .title {
+    font-size: 2rem;
+  }
+  
+  .userInfo {
+    flex-direction: column;
+    gap: 1rem;
+  }
+}
+
+/* MLG floating elements */
+.mlgElement {
+  position: fixed;
+  z-index: 999;
+  pointer-events: none;
+  opacity: 0;
+  animation: mlgFloat 3s ease-out forwards;
+}
+
+@keyframes mlgFloat {
+  0% {
+    opacity: 0;
+    transform: scale(0.5) rotate(0deg);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1) rotate(180deg);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.5) rotate(360deg);
+  }
+}
+
+/* Thomas effect for DOUBLE wins */
+.thomasEffect {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1001;
+  animation: thomasZoom 2s ease-out forwards;
+}
+
+@keyframes thomasZoom {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0);
+  }
+  50% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.2);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(2);
+  }
+}
+
+/* Doritos rotation */
+.doritosRotate {
+  animation: doritosRotate 1s linear infinite;
+}
+
+@keyframes doritosRotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Mountain Dew glow effect */
+.mountainDewGlow {
+  filter: drop-shadow(0 0 10px #00ff00);
+  animation: pulse 1s ease-in-out infinite;
+}
