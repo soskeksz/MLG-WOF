@@ -60,4 +60,4 @@ const Wheel = ({ rotation }) => {
   );
 };
 
-export default MemorySafeWheel;
+export default Wheel;
