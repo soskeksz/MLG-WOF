@@ -168,32 +168,32 @@
 }
 
 .wheelSection:nth-child(1) {
-  background-color: #ff0000;
+  background-color: #ff0000; /* Red for BANKRUPT */
   transform: rotate(0deg);
 }
 
 .wheelSection:nth-child(2) {
-  background-color: #00ff00;
+  background-color: #ff7f00; /* Orange for LOSE */
   transform: rotate(60deg);
 }
 
 .wheelSection:nth-child(3) {
-  background-color: #0000ff;
+  background-color: #ffff00; /* Yellow for KEEP */
   transform: rotate(120deg);
 }
 
 .wheelSection:nth-child(4) {
-  background-color: #ffff00;
+  background-color: #00ff00; /* Green for TRIPLE */
   transform: rotate(180deg);
 }
 
 .wheelSection:nth-child(5) {
-  background-color: #ff00ff;
+  background-color: #0000ff; /* Blue for THOMAS */
   transform: rotate(240deg);
 }
 
 .wheelSection:nth-child(6) {
-  background-color: #00ffff;
+  background-color: #ff00ff; /* Pink for JACKPOT */
   transform: rotate(300deg);
 }
 
@@ -216,9 +216,24 @@
   position: relative;
 }
 
-.result.double {
+.result.triple {
   background-color: rgba(0, 255, 0, 0.3);
   border: 2px solid #00ff00;
+}
+
+.result.lose {
+  background-color: rgba(255, 127, 0, 0.3);
+  border: 2px solid #ff7f00;
+}
+
+.result.thomas {
+  background-color: rgba(0, 0, 255, 0.3);
+  border: 2px solid #0000ff;
+}
+
+.result.jackpot {
+  background-color: rgba(255, 0, 255, 0.3);
+  border: 2px solid #ff00ff;
 }
 
 .result.keep {

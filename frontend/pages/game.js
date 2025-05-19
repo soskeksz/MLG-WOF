@@ -355,20 +355,23 @@ export default function Game() {
             </button>
           </div>
           
-          <div className={styles.wheelContainer}>
-            <div 
-              className={styles.wheel} 
-              style={{ transform: `rotate(${wheelRotation}deg)` }}
-            >
-              <div className={`${styles.wheelSection} ${styles.double}`}>DOUBLE</div>
-              <div className={`${styles.wheelSection} ${styles.keep}`}>KEEP</div>
-              <div className={`${styles.wheelSection} ${styles.bankrupt}`}>BANKRUPT</div>
-              <div className={`${styles.wheelSection} ${styles.keep}`}>KEEP</div>
-              <div className={`${styles.wheelSection} ${styles.bankrupt}`}>BANKRUPT</div>
-              <div className={`${styles.wheelSection} ${styles.keep}`}>KEEP</div>
+            <div className={styles.wheelContainer}>
+              <div 
+                className={styles.wheel} 
+                style={{ transform: `rotate(${wheelRotation}deg)` }}
+              >
+                {/* Text labels are separate from the background gradient */}
+                <div className={styles.wheelLabels}>
+                  <div className={styles.label} style={{ transform: 'rotate(9deg)' }}>BANKRUPT</div>
+                  <div className={styles.label} style={{ transform: 'rotate(72deg)' }}>LOSE</div>
+                  <div className={styles.label} style={{ transform: 'rotate(180deg)' }}>KEEP</div>
+                  <div className={styles.label} style={{ transform: 'rotate(270deg)' }}>TRIPLE</div>
+                  <div className={styles.label} style={{ transform: 'rotate(324deg)' }}>THOMAS</div>
+                  <div className={styles.label} style={{ transform: 'rotate(351deg)' }}>JACKPOT</div>
+                </div>
+              </div>
+              <div className={styles.wheelPointer}>▼</div>
             </div>
-            <div className={styles.wheelPointer}>▼</div>
-          </div>
         </div>
         
         {showResult && (
