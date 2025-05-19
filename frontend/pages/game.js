@@ -152,20 +152,24 @@ export default function Game() {
     // Clear any existing MLG elements
     setMlgElements([]);
     
-    // Animate wheel spinning
-    const spins = 5;
-    const degreesPerSpin = 360;
-    const startRotation = wheelRotation;
-    const endRotation = startRotation + (spins * degreesPerSpin) + Math.floor(Math.random() * 360);
-    
-    setWheelRotation(endRotation);
-    
     try {
       // Send spin request to API
       const res = await axios.post('/api/game/spin', {
         username,
         betAmount
       });
+      
+      // Animate wheel spinning
+      const spins = 5;
+      
+      //const degreesPerSpin = 360;
+      //const startRotation = wheelRotation;
+      //const endRotation = startRotation + (spins * degreesPerSpin) + Math.floor(Math.random() * 360);
+      
+      const baseRotation = wheelRotation - (wheelRotation % 360); // Reset to nearest 360 multiple
+      const targetRotation = baseRotation + (spins * 360) + (res.data.angle || 0);
+      
+      setWheelRotation(targetRotation);
       
       // Wait for wheel animation to finish
       setTimeout(() => {
