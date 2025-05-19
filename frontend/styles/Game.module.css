@@ -140,62 +140,89 @@
   height: 300px;
 }
 
+/* Memory-efficient wheel using conic-gradient */
 .wheel {
-  width: 100%;
-  height: 100%;
+  width: 300px;
+  height: 300px;
   border-radius: 50%;
+  border: 5px solid white;
   position: relative;
   overflow: hidden;
-  border: 5px solid #fff;
   transition: transform 3s cubic-bezier(0.25, 0.1, 0.25, 1);
-  display: flex;
-  flex-direction: column;
+  /* These angles exactly match your backend probabilities */
+  background: conic-gradient(
+    #ff0000 0deg 18deg,     /* BANKRUPT - 5% */
+    #ff7f00 18deg 126deg,   /* LOSE - 30% */
+    #ffff00 126deg 234deg,  /* KEEP - 30% */
+    #00ff00 234deg 306deg,  /* TRIPLE - 20% */
+    #0000ff 306deg 342deg,  /* THOMAS - 10% */
+    #ff00ff 342deg 360deg   /* JACKPOT - 5% */
+  );
 }
 
-.wheelSection {
+.wheelLabels {
   position: absolute;
   width: 100%;
-  height: 50%;
-  transform-origin: 50% 100%;
-  display: flex;
-  align-items: flex-start;
-  justify-content: center;
-  font-weight: bold;
-  font-size: 0.9rem;
-  color: white;
-  text-shadow: 1px 1px 2px black;
-  padding-top: 20px;
+  height: 100%;
+  top: 0;
+  left: 0;
+  pointer-events: none; /* Prevent labels from blocking clicks */
 }
 
-.wheelSection:nth-child(1) {
-  background-color: #ff0000; /* Red for BANKRUPT */
+.label {
+  position: absolute;
+  width: 80px;
+  color: white;
+  font-weight: bold;
+  text-align: center;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+  transform-origin: center;
+  font-size: 14px;
+}
+
+/* Position each label at the center of its segment with readable orientation */
+.wheel .label:nth-child(1) {
+  /* BANKRUPT */
+  top: 45px;
+  right: 70px;
   transform: rotate(0deg);
 }
 
-.wheelSection:nth-child(2) {
-  background-color: #ff7f00; /* Orange for LOSE */
-  transform: rotate(60deg);
+.wheel .label:nth-child(2) {
+  /* LOSE */
+  top: 125px;
+  right: 50px;
+  transform: rotate(0deg);
 }
 
-.wheelSection:nth-child(3) {
-  background-color: #ffff00; /* Yellow for KEEP */
-  transform: rotate(120deg);
+.wheel .label:nth-child(3) {
+  /* KEEP */
+  bottom: 90px;
+  left: 135px;
+  transform: rotate(0deg);
 }
 
-.wheelSection:nth-child(4) {
-  background-color: #00ff00; /* Green for TRIPLE */
-  transform: rotate(180deg);
+.wheel .label:nth-child(4) {
+  /* TRIPLE */
+  top: 120px;
+  left: 50px;
+  transform: rotate(0deg);
 }
 
-.wheelSection:nth-child(5) {
-  background-color: #0000ff; /* Blue for THOMAS */
-  transform: rotate(240deg);
+.wheel .label:nth-child(5) {
+  /* THOMAS */
+  top: 55px;
+  left: 85px;
+  transform: rotate(0deg);
 }
 
-.wheelSection:nth-child(6) {
-  background-color: #ff00ff; /* Pink for JACKPOT */
-  transform: rotate(300deg);
+.wheel .label:nth-child(6) {
+  /* JACKPOT */
+  top: 35px;
+  left: 135px;
+  transform: rotate(0deg);
 }
+
 
 .wheelPointer {
   position: absolute;
