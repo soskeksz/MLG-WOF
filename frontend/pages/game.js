@@ -4,7 +4,7 @@ import axios from 'axios';
 import Head from 'next/head';
 import Link from 'next/link';
 import styles from '../styles/Game.module.css';
-
+imp
 export default function Game() {
   const router = useRouter();
   const { username } = router.query;

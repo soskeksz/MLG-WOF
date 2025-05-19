@@ -2,7 +2,7 @@
 import React from 'react';
 import styles from '../styles/Game.module.css';
 
-const MemorySafeWheel = ({ rotation }) => {
+const Wheel = ({ rotation }) => {
   return (
     <div className={styles.wheelContainer}>
       <svg 
