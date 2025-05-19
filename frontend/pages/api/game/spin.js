@@ -2,15 +2,15 @@ import connectToDatabase from '../../../lib/mongodb';
 import User from '../../../lib/models/User';
 
 // Game logic function
-function spinWheel() {
+function getSpinResult() {
   const random = Math.random();
   
   if (random < 0.1) {
-    return "DOUBLE";
+    return { result: "DOUBLE", angle: 30 };
   } else if (random < 0.7) {
-    return "KEEP";
+    return { result: "KEEP", angle: 150 };
   } else {
-    return "BANKRUPT";
+    return { result: "BANKRUPT", angle: 270 };
   }
 }
 
@@ -43,7 +43,7 @@ export default async function handler(req, res) {
       }
       
       // Spin the wheel
-      const result = spinWheel();
+      const { result, angle} = getSpinResult();
       let newBalance = user.money;
       
       // Process the result
@@ -67,7 +67,8 @@ export default async function handler(req, res) {
       return res.status(200).json({
         result,
         newBalance,
-        username: user.username
+        username: user.username,
+        angle
       });
     } catch (error) {
       console.error('Error spinning wheel:', error);
