@@ -4,6 +4,7 @@ import axios from 'axios';
 import Head from 'next/head';
 import Link from 'next/link';
 import styles from '../styles/Game.module.css';
+import Wheel from '../components/Wheel'; // Using our new wheel
 
 export default function Game() {
   const router = useRouter();
@@ -17,6 +18,8 @@ export default function Game() {
   const [result, setResult] = useState(null);
   const [showResult, setShowResult] = useState(false);
   const [wheelRotation, setWheelRotation] = useState(0);
+  // New state to track previous rotation
+  const [previousRotation, setPreviousRotation] = useState(0);
   
   // MLG effect states
   const [showHitmarker, setShowHitmarker] = useState(false);
@@ -138,7 +141,7 @@ export default function Game() {
     }
   }, [playSound]);
   
-  // Function to spin the wheel
+  // Function to spin the wheel - IMPROVED WITH MULTIPLE SPINS
   const spinWheel = async () => {
     if (spinning || !user) return;
     
@@ -159,17 +162,33 @@ export default function Game() {
         betAmount
       });
       
-      // Animate wheel spinning
-      const spins = 5;
+      console.log("Result:", res.data.result);
+      console.log("Segment degree:", res.data.segmentDegree);
       
-      //const degreesPerSpin = 360;
-      //const startRotation = wheelRotation;
-      //const endRotation = startRotation + (spins * degreesPerSpin) + Math.floor(Math.random() * 360);
+      // IMPROVED ROTATION: Ensure wheel always spins significantly
+      // Base angle to get the winning segment to the top
+      const baseAngle = 360 - res.data.segmentDegree;
       
-      const baseRotation = wheelRotation - (wheelRotation % 360); // Reset to nearest 360 multiple
-      const targetRotation = baseRotation + (spins * 360) + (res.data.angle || 0);
+      // Calculate current full rotations
+      const currentFullRotations = Math.floor(wheelRotation / 360) * 360;
       
+      // Minimum spins (at least 5 full rotations)
+      const minSpins = 5;
+      
+      // Calculate extra spins - add randomness (between 5-7 full rotations)
+      const extraSpins = minSpins * 360 + (Math.floor(Math.random() * 2) * 360);
+      
+      // Calculate final target rotation
+      const targetRotation = currentFullRotations + extraSpins + baseAngle;
+      
+      console.log("Previous rotation:", previousRotation);
+      console.log("Target rotation:", targetRotation);
+      
+      // Update wheel rotation
       setWheelRotation(targetRotation);
+      
+      // Save this rotation for next time
+      setPreviousRotation(targetRotation);
       
       // Wait for wheel animation to finish
       setTimeout(() => {
@@ -178,34 +197,59 @@ export default function Game() {
         setShowResult(true);
         
         // Handle different results with MLG effects
-        if (res.data.result === "DOUBLE") {
-          // Epic win effects
-          playSound('airhorn');
-          setShowRainbow(true);
-          setShowThomas(true);
-          
-          // Create floating elements with delays
-          setTimeout(() => createMlgElement('doritos'), 100);
-          setTimeout(() => createMlgElement('dew'), 500);
-          setTimeout(() => playSound('ohmygod'), 500);
-          
-        } else if (res.data.result === "BANKRUPT") {
-          // Wasted effects
-          playSound('wasted');
-          setShowWasted(true);
-          setTimeout(() => playSound('damnson'), 1000);
-          
-        } else {
-          // Keep effects
-          playSound('applause');
-          createMlgElement('dew');
+        switch(res.data.result) {
+          case "JACKPOT":
+            console.log("jackpot");
+            playSound('airhorn');
+            setShowRainbow(true);
+            setShowThomas(true);
+            setTimeout(() => createMlgElement('doritos'), 100);
+            setTimeout(() => createMlgElement('dew'), 300);
+            setTimeout(() => createMlgElement('doritos'), 500);
+            setTimeout(() => playSound('ohmygod'), 700);
+            break;
+            
+          case "TRIPLE":
+            console.log("triple");
+            playSound('airhorn');
+            setShowRainbow(true);
+            setTimeout(() => createMlgElement('doritos'), 100);
+            setTimeout(() => playSound('applause'), 300);
+            break;
+            
+          case "THOMAS":
+            console.log("thomas");
+            playSound('thomas');
+            setShowThomas(true);
+            setShowRainbow(true);
+            setTimeout(() => createMlgElement('dew'), 500);
+            break;
+            
+          case "KEEP":
+            console.log("keep");
+            playSound('applause');
+            createMlgElement('dew');
+            break;
+            
+          case "LOSE":
+            console.log("lose");
+            playSound('intervention');
+            createMlgElement('dew');
+            break;
+            
+          case "BANKRUPT":
+            console.log("bankrupt");
+            playSound('wasted');
+            setShowWasted(true);
+            setTimeout(() => playSound('damnson'), 1000);
+            break;
         }
-        
         setSpinning(false);
       }, 3000);
     } catch (error) {
       console.error('Error spinning wheel:', error);
-      setError('Failed to spin wheel');
+      console.error('Error details:', error.response?.data || error.message);
+      setError('Failed to spin wheel: ' + (error.response?.data?.message || error.message));
       setSpinning(false);
     }
   };
@@ -355,30 +399,17 @@ export default function Game() {
             </button>
           </div>
           
-          <div className={styles.wheelContainer}>
-            <div 
-              className={styles.wheel} 
-              style={{ transform: `rotate(${wheelRotation}deg)` }}
-            >
-              <div className={`${styles.wheelSection} ${styles.double}`}>DOUBLE</div>
-              <div className={`${styles.wheelSection} ${styles.keep}`}>KEEP</div>
-              <div className={`${styles.wheelSection} ${styles.bankrupt}`}>BANKRUPT</div>
-              <div className={`${styles.wheelSection} ${styles.keep}`}>KEEP</div>
-              <div className={`${styles.wheelSection} ${styles.bankrupt}`}>BANKRUPT</div>
-              <div className={`${styles.wheelSection} ${styles.keep}`}>KEEP</div>
-            </div>
-            <div className={styles.wheelPointer}>▼</div>
-          </div>
+          {/* Using our new SimpleWheel component */}
+          <Wheel rotation={wheelRotation} />
         </div>
         
         {showResult && (
           <div className={`${styles.result} ${styles[result.toLowerCase()]}`}>
             <h2>{result}</h2>
-            {result === 'DOUBLE' && (
-              <div className={styles.mlgOverlay}>
-                <span style={{ fontSize: '2rem' }}>😎 EPIC WIN 😎</span>
-              </div>
-            )}
+            {/* Debug info to verify alignment */}
+            <div style={{fontSize: '0.8rem', color: 'yellow'}}>
+              Backend segment: {result}
+            </div>
           </div>
         )}
         
