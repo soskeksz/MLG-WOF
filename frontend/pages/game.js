@@ -1,10 +1,11 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, Component } from 'react';
 import { useRouter } from 'next/router';
 import axios from 'axios';
 import Head from 'next/head';
 import Link from 'next/link';
 import styles from '../styles/Game.module.css';
-imp
+import Wheel from '../components/Wheel'
+
 export default function Game() {
   const router = useRouter();
   const { username } = router.query;
@@ -159,50 +160,76 @@ export default function Game() {
         betAmount
       });
       
-      // Animate wheel spinning
-      const spins = 5;
-      
-      //const degreesPerSpin = 360;
-      //const startRotation = wheelRotation;
-      //const endRotation = startRotation + (spins * degreesPerSpin) + Math.floor(Math.random() * 360);
-      
-      const baseRotation = wheelRotation - (wheelRotation % 360); // Reset to nearest 360 multiple
-      const targetRotation = baseRotation + (spins * 360) + (res.data.angle || 0);
-      
-      setWheelRotation(targetRotation);
+    const spins = 5;
+    
+    // Simple rotation calculation - we rotate to place the result at the top
+    const targetAngle = 360 - res.data.angle;
+    const baseRotation = Math.floor(wheelRotation / 360) * 360;
+    const targetRotation = baseRotation + (spins * 360) + targetAngle;
+    
+    console.log("Result:", res.data.result);
+    console.log("Backend angle:", res.data.angle);
+    console.log("Target rotation:", targetRotation);
+    
+    setWheelRotation(targetRotation);
       
       // Wait for wheel animation to finish
-      setTimeout(() => {
-        setResult(res.data.result);
-        setUser({ ...user, money: res.data.newBalance });
-        setShowResult(true);
+    // Wait for wheel animation to finish
+    setTimeout(() => {
+    setResult(res.data.result);
+    setUser({ ...user, money: res.data.newBalance });
+    setShowResult(true);
+  
+    // Handle different results with MLG effects
+    switch(res.data.result) {
+      case "JACKPOT":
+        console.log("jackpot");
+        playSound('airhorn');
+        setShowRainbow(true);
+        setShowThomas(true);
+        setTimeout(() => createMlgElement('doritos'), 100);
+        setTimeout(() => createMlgElement('dew'), 300);
+        setTimeout(() => createMlgElement('doritos'), 500);
+        setTimeout(() => playSound('ohmygod'), 700);
+        break;
         
-        // Handle different results with MLG effects
-        if (res.data.result === "DOUBLE") {
-          // Epic win effects
-          playSound('airhorn');
-          setShowRainbow(true);
-          setShowThomas(true);
-          
-          // Create floating elements with delays
-          setTimeout(() => createMlgElement('doritos'), 100);
-          setTimeout(() => createMlgElement('dew'), 500);
-          setTimeout(() => playSound('ohmygod'), 500);
-          
-        } else if (res.data.result === "BANKRUPT") {
-          // Wasted effects
-          playSound('wasted');
-          setShowWasted(true);
-          setTimeout(() => playSound('damnson'), 1000);
-          
-        } else {
-          // Keep effects
-          playSound('applause');
-          createMlgElement('dew');
-        }
+      case "TRIPLE":
+        console.log("triple");
+        playSound('airhorn');
+        setShowRainbow(true);
+        setTimeout(() => createMlgElement('doritos'), 100);
+        setTimeout(() => playSound('applause'), 300);
+        break;
         
-        setSpinning(false);
-      }, 3000);
+      case "THOMAS":
+        console.log("thomas");
+        playSound('thomas');
+        setShowThomas(true);
+        setShowRainbow(true);
+        setTimeout(() => createMlgElement('dew'), 500);
+        break;
+        
+      case "KEEP":
+        console.log("keep");
+        playSound('applause');
+        createMlgElement('dew');
+        break;
+        
+      case "LOSE":
+        console.log("lose");
+        playSound('intervention');
+        createMlgElement('dew');
+        break;
+        
+      case "BANKRUPT":
+        console.log("bankrupt");
+        playSound('wasted');
+        setShowWasted(true);
+        setTimeout(() => playSound('damnson'), 1000);
+        break;
+    }
+    setSpinning(false);
+  }, 3000);
     } catch (error) {
       console.error('Error spinning wheel:', error);
       setError('Failed to spin wheel');
@@ -361,14 +388,7 @@ export default function Game() {
                 style={{ transform: `rotate(${wheelRotation}deg)` }}
               >
                 {/* Text labels are separate from the background gradient */}
-                <div className={styles.wheelLabels}>
-                  <div className={styles.label} style={{ transform: 'rotate(9deg)' }}>BANKRUPT</div>
-                  <div className={styles.label} style={{ transform: 'rotate(72deg)' }}>LOSE</div>
-                  <div className={styles.label} style={{ transform: 'rotate(180deg)' }}>KEEP</div>
-                  <div className={styles.label} style={{ transform: 'rotate(270deg)' }}>TRIPLE</div>
-                  <div className={styles.label} style={{ transform: 'rotate(324deg)' }}>THOMAS</div>
-                  <div className={styles.label} style={{ transform: 'rotate(351deg)' }}>JACKPOT</div>
-                </div>
+                <Wheel rotation={wheelRotation}/>
               </div>
               <div className={styles.wheelPointer}>▼</div>
             </div>

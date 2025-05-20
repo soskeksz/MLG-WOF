@@ -141,23 +141,32 @@
 }
 
 /* Memory-efficient wheel using conic-gradient */
-.wheel {
+.wheelContainer {
+  position: relative;
   width: 300px;
   height: 300px;
-  border-radius: 50%;
-  border: 5px solid white;
-  position: relative;
-  overflow: hidden;
+}
+
+.wheelWrapper {
+  width: 100%;
+  height: 100%;
   transition: transform 3s cubic-bezier(0.25, 0.1, 0.25, 1);
-  /* These angles exactly match your backend probabilities */
-  background: conic-gradient(
-    #ff0000 0deg 18deg,     /* BANKRUPT - 5% */
-    #ff7f00 18deg 126deg,   /* LOSE - 30% */
-    #ffff00 126deg 234deg,  /* KEEP - 30% */
-    #00ff00 234deg 306deg,  /* TRIPLE - 20% */
-    #0000ff 306deg 342deg,  /* THOMAS - 10% */
-    #ff00ff 342deg 360deg   /* JACKPOT - 5% */
-  );
+}
+
+.wheelCanvas {
+  width: 100%;
+  height: 100%;
+}
+
+.wheelPointer {
+  position: absolute;
+  top: -15px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 2rem;
+  color: #fff;
+  z-index: 10;
+  filter: drop-shadow(0 0 3px black);
 }
 
 .wheelLabels {
@@ -179,50 +188,6 @@
   transform-origin: center;
   font-size: 14px;
 }
-
-/* Position each label at the center of its segment with readable orientation */
-.wheel .label:nth-child(1) {
-  /* BANKRUPT */
-  top: 45px;
-  right: 70px;
-  transform: rotate(0deg);
-}
-
-.wheel .label:nth-child(2) {
-  /* LOSE */
-  top: 125px;
-  right: 50px;
-  transform: rotate(0deg);
-}
-
-.wheel .label:nth-child(3) {
-  /* KEEP */
-  bottom: 90px;
-  left: 135px;
-  transform: rotate(0deg);
-}
-
-.wheel .label:nth-child(4) {
-  /* TRIPLE */
-  top: 120px;
-  left: 50px;
-  transform: rotate(0deg);
-}
-
-.wheel .label:nth-child(5) {
-  /* THOMAS */
-  top: 55px;
-  left: 85px;
-  transform: rotate(0deg);
-}
-
-.wheel .label:nth-child(6) {
-  /* JACKPOT */
-  top: 35px;
-  left: 135px;
-  transform: rotate(0deg);
-}
-
 
 .wheelPointer {
   position: absolute;
