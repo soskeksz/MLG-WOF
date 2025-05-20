@@ -2,28 +2,54 @@
 import connectToDatabase from '../../../lib/mongodb';
 import User from '../../../lib/models/User';
 
+// Simple helper function
 function getRandomInt(min, max) {
   min = Math.ceil(min);
   max = Math.floor(max);
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
+// Completely rewritten spin result function
 function getSpinResult() {
   const random = Math.random();
   
-  // Simplified version with clear result-to-angle mapping
+  // Each segment is exactly at these fixed angles (center points)
   if (random < 0.05) {
-    return { result: "BANKRUPT", angle: getRandomInt(0, 60) };
+    return { 
+      result: "BANKRUPT", 
+      // Center of BANKRUPT segment (0 degrees)
+      segmentDegree: 0 
+    };
   } else if (random < 0.35) {
-    return { result: "LOSE", angle: getRandomInt(60, 120) };
+    return { 
+      result: "LOSE", 
+      // Center of LOSE segment (60 degrees)
+      segmentDegree: 60
+    };
   } else if (random < 0.65) {
-    return { result: "KEEP", angle: getRandomInt(120, 180) };
+    return { 
+      result: "KEEP", 
+      // Center of KEEP segment (120 degrees)
+      segmentDegree: 120
+    };
   } else if (random < 0.85) {
-    return { result: "TRIPLE", angle: getRandomInt(180, 240) };
+    return { 
+      result: "TRIPLE", 
+      // Center of TRIPLE segment (180 degrees)
+      segmentDegree: 180
+    };
   } else if (random < 0.95) {
-    return { result: "THOMAS", angle: getRandomInt(240, 300) };
+    return { 
+      result: "THOMAS", 
+      // Center of THOMAS segment (240 degrees)
+      segmentDegree: 240
+    };
   } else {
-    return { result: "JACKPOT", angle: getRandomInt(300, 360) };
+    return { 
+      result: "JACKPOT", 
+      // Center of JACKPOT segment (300 degrees)
+      segmentDegree: 300
+    };
   }
 }
 
@@ -39,7 +65,7 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Username is required' });
     }
     
-    if (!betAmount || isNaN(betAmount) || betAmount <= 0) {
+    if (!betAmount || isNaN(parseInt(betAmount)) || parseInt(betAmount) <= 0) {
       return res.status(400).json({ error: 'Valid bet amount is required' });
     }
     
@@ -53,30 +79,30 @@ export default async function handler(req, res) {
     }
     
     // Check if user has enough money
-    if (user.money < betAmount) {
+    if (user.money < parseInt(betAmount)) {
       return res.status(400).json({ error: 'Not enough money to place this bet' });
     }
     
-    // Get spin result
-    const { result, angle } = getSpinResult();
+    // Get spin result with fixed segment degrees
+    const { result, segmentDegree } = getSpinResult();
     let newBalance = user.money;
     
     // Update balance based on result
     switch (result) {
       case "JACKPOT":
-        newBalance += betAmount * 10;
+        newBalance += parseInt(betAmount) * 10;
         break;
       case "THOMAS":
-        newBalance += betAmount * 5;
+        newBalance += parseInt(betAmount) * 5;
         break;
       case "TRIPLE":
-        newBalance += betAmount * 3;
+        newBalance += parseInt(betAmount) * 3;
         break;
       case "KEEP":
         // Balance stays the same
         break;
       case "LOSE":
-        newBalance -= betAmount;
+        newBalance -= parseInt(betAmount);
         break;
       case "BANKRUPT":
         newBalance = 0;
@@ -88,10 +114,10 @@ export default async function handler(req, res) {
     user.lastPlayed = new Date();
     await user.save();
     
-    // Return result
+    // Return result with the fixed segment degree
     return res.status(200).json({
       result,
-      angle,
+      segmentDegree,
       newBalance,
       username: user.username
     });

@@ -1,10 +1,10 @@
-import { useState, useEffect, useCallback, Component } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/router';
 import axios from 'axios';
 import Head from 'next/head';
 import Link from 'next/link';
 import styles from '../styles/Game.module.css';
-import Wheel from '../components/Wheel'
+import Wheel from '../components/Wheel'; // Using our new wheel
 
 export default function Game() {
   const router = useRouter();
@@ -139,7 +139,7 @@ export default function Game() {
     }
   }, [playSound]);
   
-  // Function to spin the wheel
+  // Function to spin the wheel - COMPLETELY REWRITTEN
   const spinWheel = async () => {
     if (spinning || !user) return;
     
@@ -160,79 +160,82 @@ export default function Game() {
         betAmount
       });
       
-    const spins = 5;
-    
-    // Simple rotation calculation - we rotate to place the result at the top
-    const targetAngle = 360 - res.data.angle;
-    const baseRotation = Math.floor(wheelRotation / 360) * 360;
-    const targetRotation = baseRotation + (spins * 360) + targetAngle;
-    
-    console.log("Result:", res.data.result);
-    console.log("Backend angle:", res.data.angle);
-    console.log("Target rotation:", targetRotation);
-    
-    setWheelRotation(targetRotation);
+      console.log("Result:", res.data.result);
+      console.log("Segment degree:", res.data.segmentDegree);
+      
+      // CRITICAL FIX: Simple, reliable wheel rotation calculation
+      const spins = 5; // Number of full spins for effect
+      const segmentDegree = res.data.segmentDegree;
+      
+      // Calculate rotation to position the winning segment at the top (pointer)
+      // We need to rotate the wheel so the segment is at the top (0 degrees/pointer)
+      // So we subtract the segment's angle from 360 to invert it
+      const targetRotation = (360 - segmentDegree) + (spins * 360);
+      
+      console.log("Target rotation:", targetRotation);
+      
+      setWheelRotation(targetRotation);
       
       // Wait for wheel animation to finish
-    // Wait for wheel animation to finish
-    setTimeout(() => {
-    setResult(res.data.result);
-    setUser({ ...user, money: res.data.newBalance });
-    setShowResult(true);
-  
-    // Handle different results with MLG effects
-    switch(res.data.result) {
-      case "JACKPOT":
-        console.log("jackpot");
-        playSound('airhorn');
-        setShowRainbow(true);
-        setShowThomas(true);
-        setTimeout(() => createMlgElement('doritos'), 100);
-        setTimeout(() => createMlgElement('dew'), 300);
-        setTimeout(() => createMlgElement('doritos'), 500);
-        setTimeout(() => playSound('ohmygod'), 700);
-        break;
+      setTimeout(() => {
+        setResult(res.data.result);
+        setUser({ ...user, money: res.data.newBalance });
+        setShowResult(true);
         
-      case "TRIPLE":
-        console.log("triple");
-        playSound('airhorn');
-        setShowRainbow(true);
-        setTimeout(() => createMlgElement('doritos'), 100);
-        setTimeout(() => playSound('applause'), 300);
-        break;
-        
-      case "THOMAS":
-        console.log("thomas");
-        playSound('thomas');
-        setShowThomas(true);
-        setShowRainbow(true);
-        setTimeout(() => createMlgElement('dew'), 500);
-        break;
-        
-      case "KEEP":
-        console.log("keep");
-        playSound('applause');
-        createMlgElement('dew');
-        break;
-        
-      case "LOSE":
-        console.log("lose");
-        playSound('intervention');
-        createMlgElement('dew');
-        break;
-        
-      case "BANKRUPT":
-        console.log("bankrupt");
-        playSound('wasted');
-        setShowWasted(true);
-        setTimeout(() => playSound('damnson'), 1000);
-        break;
-    }
-    setSpinning(false);
-  }, 3000);
+        // Handle different results with MLG effects
+        switch(res.data.result) {
+          case "JACKPOT":
+            console.log("jackpot");
+            playSound('airhorn');
+            setShowRainbow(true);
+            setShowThomas(true);
+            setTimeout(() => createMlgElement('doritos'), 100);
+            setTimeout(() => createMlgElement('dew'), 300);
+            setTimeout(() => createMlgElement('doritos'), 500);
+            setTimeout(() => playSound('ohmygod'), 700);
+            break;
+            
+          case "TRIPLE":
+            console.log("triple");
+            playSound('airhorn');
+            setShowRainbow(true);
+            setTimeout(() => createMlgElement('doritos'), 100);
+            setTimeout(() => playSound('applause'), 300);
+            break;
+            
+          case "THOMAS":
+            console.log("thomas");
+            playSound('thomas');
+            setShowThomas(true);
+            setShowRainbow(true);
+            setTimeout(() => createMlgElement('dew'), 500);
+            break;
+            
+          case "KEEP":
+            console.log("keep");
+            playSound('applause');
+            createMlgElement('dew');
+            break;
+            
+          case "LOSE":
+            console.log("lose");
+            playSound('intervention');
+            createMlgElement('dew');
+            break;
+            
+          case "BANKRUPT":
+            console.log("bankrupt");
+            playSound('wasted');
+            setShowWasted(true);
+            setTimeout(() => playSound('damnson'), 1000);
+            break;
+        }
+        setSpinning(false);
+      }, 3000);
     } catch (error) {
       console.error('Error spinning wheel:', error);
-      setError('Failed to spin wheel');
+      console.error('Error details:', error.response?.data || error.message);
+      setError('Failed to spin wheel: ' + (error.response?.data?.message || error.message));
       setSpinning(false);
     }
   };
@@ -382,26 +385,17 @@ export default function Game() {
             </button>
           </div>
           
-            <div className={styles.wheelContainer}>
-              <div 
-                className={styles.wheel} 
-                style={{ transform: `rotate(${wheelRotation}deg)` }}
-              >
-                {/* Text labels are separate from the background gradient */}
-                <Wheel rotation={wheelRotation}/>
-              </div>
-              <div className={styles.wheelPointer}>▼</div>
-            </div>
+          {/* CHANGED: Using our new SimpleWheel component */}
+          <Wheel rotation={wheelRotation} />
         </div>
         
         {showResult && (
           <div className={`${styles.result} ${styles[result.toLowerCase()]}`}>
             <h2>{result}</h2>
-            {result === 'DOUBLE' && (
-              <div className={styles.mlgOverlay}>
-                <span style={{ fontSize: '2rem' }}>😎 EPIC WIN 😎</span>
-              </div>
-            )}
+            {/* Debug info to verify alignment */}
+            <div style={{fontSize: '0.8rem', color: 'yellow'}}>
+              Backend segment: {result}
+            </div>
           </div>
         )}
         
