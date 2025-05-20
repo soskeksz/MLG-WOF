@@ -18,6 +18,8 @@ export default function Game() {
   const [result, setResult] = useState(null);
   const [showResult, setShowResult] = useState(false);
   const [wheelRotation, setWheelRotation] = useState(0);
+  // New state to track previous rotation
+  const [previousRotation, setPreviousRotation] = useState(0);
   
   // MLG effect states
   const [showHitmarker, setShowHitmarker] = useState(false);
@@ -139,7 +141,7 @@ export default function Game() {
     }
   }, [playSound]);
   
-  // Function to spin the wheel - COMPLETELY REWRITTEN
+  // Function to spin the wheel - IMPROVED WITH MULTIPLE SPINS
   const spinWheel = async () => {
     if (spinning || !user) return;
     
@@ -163,18 +165,30 @@ export default function Game() {
       console.log("Result:", res.data.result);
       console.log("Segment degree:", res.data.segmentDegree);
       
-      // CRITICAL FIX: Simple, reliable wheel rotation calculation
-      const spins = 5; // Number of full spins for effect
-      const segmentDegree = res.data.segmentDegree;
+      // IMPROVED ROTATION: Ensure wheel always spins significantly
+      // Base angle to get the winning segment to the top
+      const baseAngle = 360 - res.data.segmentDegree;
       
-      // Calculate rotation to position the winning segment at the top (pointer)
-      // We need to rotate the wheel so the segment is at the top (0 degrees/pointer)
-      // So we subtract the segment's angle from 360 to invert it
-      const targetRotation = (360 - segmentDegree) + (spins * 360);
+      // Calculate current full rotations
+      const currentFullRotations = Math.floor(wheelRotation / 360) * 360;
       
+      // Minimum spins (at least 5 full rotations)
+      const minSpins = 5;
+      
+      // Calculate extra spins - add randomness (between 5-7 full rotations)
+      const extraSpins = minSpins * 360 + (Math.floor(Math.random() * 2) * 360);
+      
+      // Calculate final target rotation
+      const targetRotation = currentFullRotations + extraSpins + baseAngle;
+      
+      console.log("Previous rotation:", previousRotation);
       console.log("Target rotation:", targetRotation);
       
+      // Update wheel rotation
       setWheelRotation(targetRotation);
+      
+      // Save this rotation for next time
+      setPreviousRotation(targetRotation);
       
       // Wait for wheel animation to finish
       setTimeout(() => {
@@ -385,7 +399,7 @@ export default function Game() {
             </button>
           </div>
           
-          {/* CHANGED: Using our new SimpleWheel component */}
+          {/* Using our new SimpleWheel component */}
           <Wheel rotation={wheelRotation} />
         </div>
         
