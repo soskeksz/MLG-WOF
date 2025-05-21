@@ -374,7 +374,7 @@ const spinWheel = async () => {
             
       {showTriple && (
         <div className={styles.tripleEffect}>
-          <img src="/images/triple.png" alt="Triple" width="400" height="300" />
+          <img src="/images/triple.png" alt="Triple" width="1500" height="750" />
         </div>
       )}
       
