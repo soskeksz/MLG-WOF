@@ -2,6 +2,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import styles from '../styles/Leaderboard.module.css';
+import { useRouter } from 'next/router';
 
 export default function Leaderboard() {
   // State management
@@ -14,7 +15,10 @@ export default function Leaderboard() {
   const [userRank, setUserRank] = useState(null);
   const [leaderboardStats, setLeaderboardStats] = useState(null);
   const [showStats, setShowStats] = useState(false);
-  
+  const router = useRouter();
+  const { username } = router.query;
+
+
   // MLG effects state
   const [showMLGEffect, setShowMLGEffect] = useState(false);
   const [floatingElements, setFloatingElements] = useState([]);
@@ -342,8 +346,11 @@ export default function Leaderboard() {
 
       {/* Navigation */}
       <div className={styles.navigation}>
-        <Link href="/game" className={styles.navButton}>
-          🎰 BACK TO GAME
+        <Link 
+          href={username ? `/game?username=${encodeURIComponent(username)}` : '/'} 
+          className={styles.navButton}
+        >
+          {username ? '🎰 BACK TO GAME' : '🏠 HOME'}
         </Link>
         <Link href="/" className={styles.navButton}>
           🏠 HOME

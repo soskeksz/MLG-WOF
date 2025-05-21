@@ -6,6 +6,7 @@ import Link from 'next/link';
 import styles from '../styles/Game.module.css';
 import Wheel from '../components/Wheel'; // Using our new wheel
 import { soundManager } from '@/lib/soundManager';
+import MemoryMonitor from '../components/MemoryMonitor';
 
 export default function Game() {
   const router = useRouter();
@@ -430,13 +431,17 @@ const spinWheel = async () => {
         )}
         
         <div className={styles.navigation}>
-          <Link href="/leaderboard" className={styles.leaderboardButton}>
+          <Link 
+            href={`/leaderboard?username=${encodeURIComponent(username)}`} 
+            className={styles.leaderboardButton}
+          >
             LEADERBOARD
           </Link>
           <Link href="/" className={styles.homeButton}>
             HOME
           </Link>
         </div>
+         {process.env.NODE_ENV !== 'production' && <MemoryMonitor />}
       </main>
     </div>
   );
