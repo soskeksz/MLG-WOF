@@ -4,6 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "dev:clean": "powershell -Command \"if (Test-Path '.next') { Remove-Item -Recurse -Force '.next' }\" && next dev",
+    "dev:mem": "set NODE_OPTIONS=\"--max-old-space-size=4096\" && next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
