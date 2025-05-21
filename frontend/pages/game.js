@@ -242,6 +242,7 @@ const spinWheel = async () => {
           
           // Use separate timeouts but limit total elements
           setTimeout(() => createMlgElement('doritos'), 100);
+          setTimeout(() => playSound('jackpot'), 200);
           setTimeout(() => createMlgElement('dew'), 300);
           setTimeout(() => createMlgElement('doritos'), 500);
           setTimeout(() => playSound('ohmygod'), 700);
