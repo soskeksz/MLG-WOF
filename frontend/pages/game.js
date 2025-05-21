@@ -5,6 +5,7 @@ import Head from 'next/head';
 import Link from 'next/link';
 import styles from '../styles/Game.module.css';
 import Wheel from '../components/Wheel'; // Using our new wheel
+import { soundManager } from '@/lib/soundManager';
 
 export default function Game() {
   const router = useRouter();
@@ -109,15 +110,15 @@ export default function Game() {
   }, [showHitmarker]);
   
   // Sound playing function
-  const playSound = useCallback((soundName) => {
-    try {
-      const sound = new Audio(`/sounds/${soundName}.mp3`);
-      sound.volume = 0.3;
-      sound.play().catch(() => {});
-    } catch (error) {
-      // Ignore audio errors
-    }
-  }, []);
+const playSound = useCallback((soundName) => {
+  try {
+    // Use soundManager instead of creating new Audio objects each time
+    soundManager.play(soundName);
+  } catch (error) {
+    // Ignore audio errors
+    console.log(`Error playing ${soundName}:`, error);
+  }
+}, []);
   
   // Create floating MLG elements with proper cleanup
   const createMlgElement = useCallback((imageName) => {
@@ -399,7 +400,7 @@ export default function Game() {
             </button>
           </div>
           
-          {/* Using our new SimpleWheel component */}
+
           <Wheel rotation={wheelRotation} />
         </div>
         

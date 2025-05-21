@@ -1,4 +1,4 @@
-// Utility for playing sounds with fallbacks
+// lib/soundManager.js
 export class SoundManager {
     constructor() {
         this.sounds = {};
@@ -6,17 +6,22 @@ export class SoundManager {
     }
   
     loadSounds() {
-    // Preload sounds
-        this.sounds = {
-            hitmarker: this.createSound('/sounds/hitmarker.mp3'),
-            airhorn: this.createSound('/sounds/airhorn.mp3'), 
-            wasted: this.createSound('/sounds/wasted.mp3'),
-            thomas: this.createSound('/sounds/thomas.mp3'),
-            intervention: this.createSound('/sounds/intervention.mp3'),
-            applause: this.createSound('/sounds/applause.mp3'),    
-            ohmygod: this.createSound('/sounds/ohmygod.mp3'),
-            damnson: this.createSound('/sounds/damnson.mp3'),
+        // Define sounds with their paths
+        const soundPaths = {
+            hitmarker: '/sounds/hitmarker.mp3',
+            airhorn: '/sounds/airhorn.mp3', 
+            wasted: '/sounds/wasted.mp3',
+            thomas: '/sounds/thomas.mp3',
+            intervention: '/sounds/intervention.mp3',
+            applause: '/sounds/applause.mp3',    
+            ohmygod: '/sounds/ohmygod.mp3',
+            damnson: '/sounds/damnson.mp3',
         };
+        
+        // Preload sounds
+        Object.entries(soundPaths).forEach(([name, path]) => {
+            this.sounds[name] = this.createSound(path);
+        });
     }
   
     createSound(src) {
@@ -33,15 +38,35 @@ export class SoundManager {
     }
   
     play(soundName) {
+        // If sound exists in our cache, use it
         if (this.sounds[soundName]) {
             try {
-                // Reset audio to beginning
-                this.sounds[soundName].currentTime = 0;
-                this.sounds[soundName].play().catch(e => 
-                console.log(`Could not play ${soundName}:`, e)
-                );
+                // Create a clone for overlapping sounds
+                const sound = this.sounds[soundName].cloneNode();
+                sound.volume = 0.3;
+                sound.play().catch(e => {
+                    console.log(`Could not play ${soundName}:`, e);
+                });
             } catch (error) {
                 console.log(`Error playing ${soundName}:`, error);
+                
+                // Fallback: create a new instance if the cached one fails
+                try {
+                    const fallbackSound = new Audio(`/sounds/${soundName}.mp3`);
+                    fallbackSound.volume = 0.3;
+                    fallbackSound.play().catch(() => {});
+                } catch (e) {
+                    // Silent failure for audio
+                }
+            }
+        } else {
+            // Fallback for sounds not in the predefined list
+            try {
+                const fallbackSound = new Audio(`/sounds/${soundName}.mp3`);
+                fallbackSound.volume = 0.3;
+                fallbackSound.play().catch(() => {});
+            } catch (e) {
+                // Silent failure for audio
             }
         }
     }
