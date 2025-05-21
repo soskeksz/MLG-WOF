@@ -426,7 +426,6 @@
   }
 }
 
-/* Thomas effect for DOUBLE wins */
 .thomasEffect {
   position: fixed;
   top: 50%;
@@ -434,6 +433,24 @@
   transform: translate(-50%, -50%);
   z-index: 1001;
   animation: thomasZoom 2s ease-out forwards;
+}
+
+.tripleEffect {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1001;
+  animation: thomasZoom 3s ease-out forwards;
+}
+
+.wowEffect {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1001;
+  animation: thomasZoom 3s ease-out forwards;
 }
 
 @keyframes thomasZoom {

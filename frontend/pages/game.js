@@ -5,6 +5,8 @@ import Head from 'next/head';
 import Link from 'next/link';
 import styles from '../styles/Game.module.css';
 import Wheel from '../components/Wheel'; // Using our new wheel
+import { soundManager } from '@/lib/soundManager';
+import MemoryMonitor from '../components/MemoryMonitor';
 
 export default function Game() {
   const router = useRouter();
@@ -27,6 +29,8 @@ export default function Game() {
   const [showWasted, setShowWasted] = useState(false);
   const [hitmarkerPosition, setHitmarkerPosition] = useState({ x: 0, y: 0 });
   const [showThomas, setShowThomas] = useState(false);
+  const [showTriple, setShowTriple] = useState(false);
+  const [showWow, setShowWow] = useState(false);  
   const [mlgElements, setMlgElements] = useState([]);
   
   // Load user data
@@ -85,7 +89,27 @@ export default function Game() {
     
     return () => clearTimeout(timer);
   }, [showThomas]);
+
+  useEffect(() => {
+    if (!showTriple) return;
+    
+    const timer = setTimeout(() => {
+      setShowTriple(false);
+    }, 2000);
+    
+    return () => clearTimeout(timer);
+  }, [showTriple]);
   
+  useEffect(() => {
+    if (!showWow) return;
+    
+    const timer = setTimeout(() => {
+      setShowWow(false);
+    }, 2000);
+    
+    return () => clearTimeout(timer);
+  }, [showWow]);
+
   // Wasted effect cleanup
   useEffect(() => {
     if (!showWasted) return;
@@ -109,28 +133,38 @@ export default function Game() {
   }, [showHitmarker]);
   
   // Sound playing function
-  const playSound = useCallback((soundName) => {
-    try {
-      const sound = new Audio(`/sounds/${soundName}.mp3`);
-      sound.volume = 0.3;
-      sound.play().catch(() => {});
-    } catch (error) {
-      // Ignore audio errors
-    }
-  }, []);
+const playSound = useCallback((soundName) => {
+  try {
+    // Use soundManager instead of creating new Audio objects each time
+    soundManager.play(soundName);
+  } catch (error) {
+    // Ignore audio errors
+    console.log(`Error playing ${soundName}:`, error);
+  }
+}, []);
   
   // Create floating MLG elements with proper cleanup
-  const createMlgElement = useCallback((imageName) => {
-    const id = Date.now() + Math.random();
-    const element = {
-      id,
+const createMlgElement = useCallback((imageName) => {
+  setMlgElements(prev => {
+    // Create new element
+    const newElement = {
+      id: Date.now() + Math.random(),
       image: imageName,
       x: Math.random() * (window.innerWidth - 100),
       y: Math.random() * (window.innerHeight - 100),
     };
     
-    setMlgElements(prev => [...prev, element]);
-  }, []);
+    // Limit to max 10 elements to prevent memory issues
+    // If we already have 10+ elements, remove the oldest one(s)
+    if (prev.length >= 10) {
+      // Get all but the first element (removing oldest)
+      return [...prev.slice(1), newElement];
+    }
+    
+    // Otherwise just add the new element
+    return [...prev, newElement];
+  });
+}, []);
   
   // Handle click for hitmarker
   const handleClick = useCallback((e) => {
@@ -142,117 +176,130 @@ export default function Game() {
   }, [playSound]);
   
   // Function to spin the wheel - IMPROVED WITH MULTIPLE SPINS
-  const spinWheel = async () => {
-    if (spinning || !user) return;
+  // In game.js, update the spinWheel function:
+const spinWheel = async () => {
+  // If already spinning or no user, do nothing
+  if (spinning || !user) return;
+  
+  // Set spinning state
+  setSpinning(true);
+  
+  // Reset states
+  setResult(null);
+  setShowResult(false);
+  setShowRainbow(false);
+  setShowWasted(false);
+  setShowThomas(false);
+  
+  // Clear all MLG elements - IMPORTANT for memory
+  setMlgElements([]);
+  
+  try {
+    // Send spin request to API
+    const res = await axios.post('/api/game/spin', {
+      username,
+      betAmount
+    });
     
-    setSpinning(true);
-    setResult(null);
-    setShowResult(false);
-    setShowRainbow(false);
-    setShowWasted(false);
-    setShowThomas(false);
+    console.log("Result:", res.data.result);
+    console.log("Segment degree:", res.data.segmentDegree);
     
-    // Clear any existing MLG elements
-    setMlgElements([]);
+    // Base angle calculation
+    const baseAngle = 360 - res.data.segmentDegree;
     
-    try {
-      // Send spin request to API
-      const res = await axios.post('/api/game/spin', {
-        username,
-        betAmount
-      });
+    // Calculate current full rotations
+    const currentFullRotations = Math.floor(wheelRotation / 360) * 360;
+    
+    // Use fixed number of spins to reduce calculations (5 rotations)
+    const extraSpins = 5 * 360;
+    
+    // Final target rotation - more efficient calculation
+    const targetRotation = currentFullRotations + extraSpins + baseAngle;
+    
+    console.log("Previous rotation:", previousRotation);
+    console.log("Target rotation:", targetRotation);
+    
+    // Update wheel rotation - do this once only
+    setWheelRotation(targetRotation);
+    
+    // Save this rotation for next time
+    setPreviousRotation(targetRotation);
+    
+    // Use a single timeout for all post-spin effects
+    const effectTimer = setTimeout(() => {
+      // Set user and result once
+      setResult(res.data.result);
+      setUser({ ...user, money: res.data.newBalance });
+      setShowResult(true);
       
-      console.log("Result:", res.data.result);
-      console.log("Segment degree:", res.data.segmentDegree);
-      
-      // IMPROVED ROTATION: Ensure wheel always spins significantly
-      // Base angle to get the winning segment to the top
-      const baseAngle = 360 - res.data.segmentDegree;
-      
-      // Calculate current full rotations
-      const currentFullRotations = Math.floor(wheelRotation / 360) * 360;
-      
-      // Minimum spins (at least 5 full rotations)
-      const minSpins = 5;
-      
-      // Calculate extra spins - add randomness (between 5-7 full rotations)
-      const extraSpins = minSpins * 360 + (Math.floor(Math.random() * 2) * 360);
-      
-      // Calculate final target rotation
-      const targetRotation = currentFullRotations + extraSpins + baseAngle;
-      
-      console.log("Previous rotation:", previousRotation);
-      console.log("Target rotation:", targetRotation);
-      
-      // Update wheel rotation
-      setWheelRotation(targetRotation);
-      
-      // Save this rotation for next time
-      setPreviousRotation(targetRotation);
-      
-      // Wait for wheel animation to finish
-      setTimeout(() => {
-        setResult(res.data.result);
-        setUser({ ...user, money: res.data.newBalance });
-        setShowResult(true);
-        
-        // Handle different results with MLG effects
-        switch(res.data.result) {
-          case "JACKPOT":
-            console.log("jackpot");
-            playSound('airhorn');
-            setShowRainbow(true);
-            setShowThomas(true);
-            setTimeout(() => createMlgElement('doritos'), 100);
-            setTimeout(() => createMlgElement('dew'), 300);
-            setTimeout(() => createMlgElement('doritos'), 500);
-            setTimeout(() => playSound('ohmygod'), 700);
-            break;
-            
-          case "TRIPLE":
-            console.log("triple");
-            playSound('airhorn');
-            setShowRainbow(true);
-            setTimeout(() => createMlgElement('doritos'), 100);
-            setTimeout(() => playSound('applause'), 300);
-            break;
-            
-          case "THOMAS":
-            console.log("thomas");
-            playSound('thomas');
-            setShowThomas(true);
-            setShowRainbow(true);
-            setTimeout(() => createMlgElement('dew'), 500);
-            break;
-            
-          case "KEEP":
-            console.log("keep");
-            playSound('applause');
-            createMlgElement('dew');
-            break;
-            
-          case "LOSE":
-            console.log("lose");
-            playSound('intervention');
-            createMlgElement('dew');
-            break;
-            
-          case "BANKRUPT":
-            console.log("bankrupt");
-            playSound('wasted');
-            setShowWasted(true);
-            setTimeout(() => playSound('damnson'), 1000);
-            break;
-        }
-        setSpinning(false);
-      }, 3000);
-    } catch (error) {
-      console.error('Error spinning wheel:', error);
-      console.error('Error details:', error.response?.data || error.message);
-      setError('Failed to spin wheel: ' + (error.response?.data?.message || error.message));
+      // Handle different results with MLG effects
+      switch(res.data.result) {
+        case "JACKPOT":
+          console.log("jackpot");
+          playSound('airhorn');
+          setShowRainbow(true);
+          setShowThomas(true);
+          
+          // Use separate timeouts but limit total elements
+          setTimeout(() => createMlgElement('doritos'), 100);
+          setTimeout(() => createMlgElement('dew'), 300);
+          setTimeout(() => createMlgElement('doritos'), 500);
+          setTimeout(() => playSound('ohmygod'), 700);
+          setTimeout(() => playSound('intervention'), 800);
+          break;
+          
+        case "TRIPLE":
+          console.log("triple");
+          playSound('airhorn');
+          setShowRainbow(true);
+          setTimeout(() => createMlgElement('triple'), 100);
+          setTimeout(() => createMlgElement('doritos'), 200);
+          setTimeout(() => playSound('applause'), 300);
+          setTimeout(() => playSound('triple'), 1200);
+          break;
+          
+        case "THOMAS":
+          console.log("thomas");
+          playSound('thomas');
+          setShowThomas(true);
+          setShowRainbow(true);
+          setTimeout(() => createMlgElement('dew'), 500);
+          break;
+          
+        case "KEEP":
+          console.log("keep");
+          playSound('applause');
+          createMlgElement('dew');
+          setShowWow(true)
+          setTimeout(() => createMlgElement('wow'), 500);
+          setTimeout(() => playSound('wow'), 560);
+          break;
+          
+        case "LOSE":
+          console.log("lose");
+          playSound('intervention');
+          createMlgElement('dew'); // Single element only
+          break;
+          
+        case "BANKRUPT":
+          console.log("bankrupt");
+          playSound('wasted');
+          setShowWasted(true);
+          setTimeout(() => playSound('damnson'), 1000);
+          setShowWow(true)
+          setTimeout(() => createMlgElement('wow'), 500);
+          break;
+      }
       setSpinning(false);
-    }
-  };
+    }, 3000);
+    
+  } catch (error) {
+    console.error('Error spinning wheel:', error);
+    console.error('Error details:', error.response?.data || error.message);
+    setError('Failed to spin wheel: ' + (error.response?.data?.message || error.message));
+    setSpinning(false);
+  }
+};
   
   if (loading) {
     return <div className={styles.loading}>Loading...</div>;
@@ -341,6 +388,18 @@ export default function Game() {
           <img src="/images/thomas.png" alt="Thomas" width="200" height="150" />
         </div>
       )}
+            
+      {showTriple && (
+        <div className={styles.tripleEffect}>
+          <img src="/images/triple.png" alt="Triple" width="1500" height="750" />
+        </div>
+      )}
+
+      {showWow && (
+        <div className={styles.wowEffect}>
+          <img src="/images/wow.png" alt="wow" width="1500" height="750" />
+        </div>
+      )}
       
       {/* Floating MLG elements */}
       {mlgElements.map(element => (
@@ -399,28 +458,28 @@ export default function Game() {
             </button>
           </div>
           
-          {/* Using our new SimpleWheel component */}
+
           <Wheel rotation={wheelRotation} />
         </div>
         
         {showResult && (
           <div className={`${styles.result} ${styles[result.toLowerCase()]}`}>
             <h2>{result}</h2>
-            {/* Debug info to verify alignment */}
-            <div style={{fontSize: '0.8rem', color: 'yellow'}}>
-              Backend segment: {result}
-            </div>
           </div>
         )}
         
         <div className={styles.navigation}>
-          <Link href="/leaderboard" className={styles.leaderboardButton}>
+          <Link 
+            href={`/leaderboard?username=${encodeURIComponent(username)}`} 
+            className={styles.leaderboardButton}
+          >
             LEADERBOARD
           </Link>
           <Link href="/" className={styles.homeButton}>
             HOME
           </Link>
         </div>
+         {process.env.NODE_ENV !== 'production' && <MemoryMonitor />}
       </main>
     </div>
   );
