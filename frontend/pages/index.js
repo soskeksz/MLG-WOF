@@ -149,7 +149,7 @@ export default function Home() {
           </form>
           
           <p className={styles.info}>
-            If username exists, you'll continue from where they left off.
+            If username exists, you\'ll continue from where they left off.
             <br />
             New users start with $1,000.
           </p>
