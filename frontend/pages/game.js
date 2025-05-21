@@ -29,6 +29,7 @@ export default function Game() {
   const [showWasted, setShowWasted] = useState(false);
   const [hitmarkerPosition, setHitmarkerPosition] = useState({ x: 0, y: 0 });
   const [showThomas, setShowThomas] = useState(false);
+  const [showTriple, setShowTriple] = useState(false);
   const [mlgElements, setMlgElements] = useState([]);
   
   // Load user data
@@ -87,6 +88,16 @@ export default function Game() {
     
     return () => clearTimeout(timer);
   }, [showThomas]);
+
+  useEffect(() => {
+    if (!showTriple) return;
+    
+    const timer = setTimeout(() => {
+      setShowTriple(false);
+    }, 2000);
+    
+    return () => clearTimeout(timer);
+  }, [showTriple]);
   
   // Wasted effect cleanup
   useEffect(() => {
@@ -223,6 +234,7 @@ const spinWheel = async () => {
           setTimeout(() => createMlgElement('dew'), 300);
           setTimeout(() => createMlgElement('doritos'), 500);
           setTimeout(() => playSound('ohmygod'), 700);
+          setTimeout(() => playSound('intervention'), 800);
           break;
           
         case "TRIPLE":
@@ -356,6 +368,12 @@ const spinWheel = async () => {
       {showThomas && (
         <div className={styles.thomasEffect}>
           <img src="/images/thomas.png" alt="Thomas" width="200" height="150" />
+        </div>
+      )}
+            
+      {showTriple && (
+        <div className={styles.tripleEffect}>
+          <img src="/images/triple.png" alt="Triple" width="400" height="300" />
         </div>
       )}
       
