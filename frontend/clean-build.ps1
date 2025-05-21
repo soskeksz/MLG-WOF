@@ -1,4 +1,4 @@
-# create a file called fixed-build.ps1
+# Update clean-build.ps1
 Write-Host "Cleaning up..." -ForegroundColor Green
 if (Test-Path ".next") {
   Remove-Item -Recurse -Force ".next"
@@ -7,10 +7,9 @@ if (Test-Path ".next") {
 Write-Host "Installing dependencies..." -ForegroundColor Green
 npm install
 
-Write-Host "Building for production..." -ForegroundColor Green
-# Add the --no-lint flag to bypass linting during build
+Write-Host "Building for production with linting disabled..." -ForegroundColor Green
 $env:NEXT_TELEMETRY_DISABLED=1
-npm run build -- --no-lint
+npx next build --no-lint
 
 # Verify build exists
 if (Test-Path ".next/BUILD_ID") {
