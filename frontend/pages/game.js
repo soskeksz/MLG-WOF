@@ -30,6 +30,7 @@ export default function Game() {
   const [hitmarkerPosition, setHitmarkerPosition] = useState({ x: 0, y: 0 });
   const [showThomas, setShowThomas] = useState(false);
   const [showTriple, setShowTriple] = useState(false);
+  const [showWow, setShowWow] = useState(false);  
   const [mlgElements, setMlgElements] = useState([]);
   
   // Load user data
@@ -99,6 +100,16 @@ export default function Game() {
     return () => clearTimeout(timer);
   }, [showTriple]);
   
+  useEffect(() => {
+    if (!showWow) return;
+    
+    const timer = setTimeout(() => {
+      setShowWow(false);
+    }, 2000);
+    
+    return () => clearTimeout(timer);
+  }, [showWow]);
+
   // Wasted effect cleanup
   useEffect(() => {
     if (!showWasted) return;
@@ -244,6 +255,7 @@ const spinWheel = async () => {
           setTimeout(() => createMlgElement('triple'), 100);
           setTimeout(() => createMlgElement('doritos'), 200);
           setTimeout(() => playSound('applause'), 300);
+          setTimeout(() => playSound('triple'), 1200);
           break;
           
         case "THOMAS":
@@ -257,7 +269,9 @@ const spinWheel = async () => {
         case "KEEP":
           console.log("keep");
           playSound('applause');
-          createMlgElement('dew'); // Single element only
+          createMlgElement('dew');
+          setShowWow(true)
+          setTimeout(() => createMlgElement('wow'), 500);
           break;
           
         case "LOSE":
@@ -271,6 +285,8 @@ const spinWheel = async () => {
           playSound('wasted');
           setShowWasted(true);
           setTimeout(() => playSound('damnson'), 1000);
+          setShowWow(true)
+          setTimeout(() => createMlgElement('wow'), 500);
           break;
       }
       setSpinning(false);
@@ -375,6 +391,12 @@ const spinWheel = async () => {
       {showTriple && (
         <div className={styles.tripleEffect}>
           <img src="/images/triple.png" alt="Triple" width="1500" height="750" />
+        </div>
+      )}
+
+      {showWow && (
+        <div className={styles.wowEffect}>
+          <img src="/images/wow.png" alt="wow" width="1500" height="750" />
         </div>
       )}
       
