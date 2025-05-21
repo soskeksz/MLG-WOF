@@ -121,17 +121,27 @@ const playSound = useCallback((soundName) => {
 }, []);
   
   // Create floating MLG elements with proper cleanup
-  const createMlgElement = useCallback((imageName) => {
-    const id = Date.now() + Math.random();
-    const element = {
-      id,
+const createMlgElement = useCallback((imageName) => {
+  setMlgElements(prev => {
+    // Create new element
+    const newElement = {
+      id: Date.now() + Math.random(),
       image: imageName,
       x: Math.random() * (window.innerWidth - 100),
       y: Math.random() * (window.innerHeight - 100),
     };
     
-    setMlgElements(prev => [...prev, element]);
-  }, []);
+    // Limit to max 10 elements to prevent memory issues
+    // If we already have 10+ elements, remove the oldest one(s)
+    if (prev.length >= 10) {
+      // Get all but the first element (removing oldest)
+      return [...prev.slice(1), newElement];
+    }
+    
+    // Otherwise just add the new element
+    return [...prev, newElement];
+  });
+}, []);
   
   // Handle click for hitmarker
   const handleClick = useCallback((e) => {
