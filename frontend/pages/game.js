@@ -153,117 +153,122 @@ const createMlgElement = useCallback((imageName) => {
   }, [playSound]);
   
   // Function to spin the wheel - IMPROVED WITH MULTIPLE SPINS
-  const spinWheel = async () => {
-    if (spinning || !user) return;
+  // In game.js, update the spinWheel function:
+const spinWheel = async () => {
+  // If already spinning or no user, do nothing
+  if (spinning || !user) return;
+  
+  // Set spinning state
+  setSpinning(true);
+  
+  // Reset states
+  setResult(null);
+  setShowResult(false);
+  setShowRainbow(false);
+  setShowWasted(false);
+  setShowThomas(false);
+  
+  // Clear all MLG elements - IMPORTANT for memory
+  setMlgElements([]);
+  
+  try {
+    // Send spin request to API
+    const res = await axios.post('/api/game/spin', {
+      username,
+      betAmount
+    });
     
-    setSpinning(true);
-    setResult(null);
-    setShowResult(false);
-    setShowRainbow(false);
-    setShowWasted(false);
-    setShowThomas(false);
+    console.log("Result:", res.data.result);
+    console.log("Segment degree:", res.data.segmentDegree);
     
-    // Clear any existing MLG elements
-    setMlgElements([]);
+    // Base angle calculation
+    const baseAngle = 360 - res.data.segmentDegree;
     
-    try {
-      // Send spin request to API
-      const res = await axios.post('/api/game/spin', {
-        username,
-        betAmount
-      });
+    // Calculate current full rotations
+    const currentFullRotations = Math.floor(wheelRotation / 360) * 360;
+    
+    // Use fixed number of spins to reduce calculations (5 rotations)
+    const extraSpins = 5 * 360;
+    
+    // Final target rotation - more efficient calculation
+    const targetRotation = currentFullRotations + extraSpins + baseAngle;
+    
+    console.log("Previous rotation:", previousRotation);
+    console.log("Target rotation:", targetRotation);
+    
+    // Update wheel rotation - do this once only
+    setWheelRotation(targetRotation);
+    
+    // Save this rotation for next time
+    setPreviousRotation(targetRotation);
+    
+    // Use a single timeout for all post-spin effects
+    const effectTimer = setTimeout(() => {
+      // Set user and result once
+      setResult(res.data.result);
+      setUser({ ...user, money: res.data.newBalance });
+      setShowResult(true);
       
-      console.log("Result:", res.data.result);
-      console.log("Segment degree:", res.data.segmentDegree);
-      
-      // IMPROVED ROTATION: Ensure wheel always spins significantly
-      // Base angle to get the winning segment to the top
-      const baseAngle = 360 - res.data.segmentDegree;
-      
-      // Calculate current full rotations
-      const currentFullRotations = Math.floor(wheelRotation / 360) * 360;
-      
-      // Minimum spins (at least 5 full rotations)
-      const minSpins = 5;
-      
-      // Calculate extra spins - add randomness (between 5-7 full rotations)
-      const extraSpins = minSpins * 360 + (Math.floor(Math.random() * 2) * 360);
-      
-      // Calculate final target rotation
-      const targetRotation = currentFullRotations + extraSpins + baseAngle;
-      
-      console.log("Previous rotation:", previousRotation);
-      console.log("Target rotation:", targetRotation);
-      
-      // Update wheel rotation
-      setWheelRotation(targetRotation);
-      
-      // Save this rotation for next time
-      setPreviousRotation(targetRotation);
-      
-      // Wait for wheel animation to finish
-      setTimeout(() => {
-        setResult(res.data.result);
-        setUser({ ...user, money: res.data.newBalance });
-        setShowResult(true);
-        
-        // Handle different results with MLG effects
-        switch(res.data.result) {
-          case "JACKPOT":
-            console.log("jackpot");
-            playSound('airhorn');
-            setShowRainbow(true);
-            setShowThomas(true);
-            setTimeout(() => createMlgElement('doritos'), 100);
-            setTimeout(() => createMlgElement('dew'), 300);
-            setTimeout(() => createMlgElement('doritos'), 500);
-            setTimeout(() => playSound('ohmygod'), 700);
-            break;
-            
-          case "TRIPLE":
-            console.log("triple");
-            playSound('airhorn');
-            setShowRainbow(true);
-            setTimeout(() => createMlgElement('doritos'), 100);
-            setTimeout(() => playSound('applause'), 300);
-            break;
-            
-          case "THOMAS":
-            console.log("thomas");
-            playSound('thomas');
-            setShowThomas(true);
-            setShowRainbow(true);
-            setTimeout(() => createMlgElement('dew'), 500);
-            break;
-            
-          case "KEEP":
-            console.log("keep");
-            playSound('applause');
-            createMlgElement('dew');
-            break;
-            
-          case "LOSE":
-            console.log("lose");
-            playSound('intervention');
-            createMlgElement('dew');
-            break;
-            
-          case "BANKRUPT":
-            console.log("bankrupt");
-            playSound('wasted');
-            setShowWasted(true);
-            setTimeout(() => playSound('damnson'), 1000);
-            break;
-        }
-        setSpinning(false);
-      }, 3000);
-    } catch (error) {
-      console.error('Error spinning wheel:', error);
-      console.error('Error details:', error.response?.data || error.message);
-      setError('Failed to spin wheel: ' + (error.response?.data?.message || error.message));
+      // Handle different results with MLG effects
+      switch(res.data.result) {
+        case "JACKPOT":
+          console.log("jackpot");
+          playSound('airhorn');
+          setShowRainbow(true);
+          setShowThomas(true);
+          
+          // Use separate timeouts but limit total elements
+          setTimeout(() => createMlgElement('doritos'), 100);
+          setTimeout(() => createMlgElement('dew'), 300);
+          setTimeout(() => createMlgElement('doritos'), 500);
+          setTimeout(() => playSound('ohmygod'), 700);
+          break;
+          
+        case "TRIPLE":
+          console.log("triple");
+          playSound('airhorn');
+          setShowRainbow(true);
+          setTimeout(() => createMlgElement('doritos'), 100);
+          setTimeout(() => playSound('applause'), 300);
+          break;
+          
+        case "THOMAS":
+          console.log("thomas");
+          playSound('thomas');
+          setShowThomas(true);
+          setShowRainbow(true);
+          setTimeout(() => createMlgElement('dew'), 500);
+          break;
+          
+        case "KEEP":
+          console.log("keep");
+          playSound('applause');
+          createMlgElement('dew'); // Single element only
+          break;
+          
+        case "LOSE":
+          console.log("lose");
+          playSound('intervention');
+          createMlgElement('dew'); // Single element only
+          break;
+          
+        case "BANKRUPT":
+          console.log("bankrupt");
+          playSound('wasted');
+          setShowWasted(true);
+          setTimeout(() => playSound('damnson'), 1000);
+          break;
+      }
       setSpinning(false);
-    }
-  };
+    }, 3000);
+    
+  } catch (error) {
+    console.error('Error spinning wheel:', error);
+    console.error('Error details:', error.response?.data || error.message);
+    setError('Failed to spin wheel: ' + (error.response?.data?.message || error.message));
+    setSpinning(false);
+  }
+};
   
   if (loading) {
     return <div className={styles.loading}>Loading...</div>;
