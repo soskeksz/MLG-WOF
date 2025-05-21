@@ -241,7 +241,8 @@ const spinWheel = async () => {
           console.log("triple");
           playSound('airhorn');
           setShowRainbow(true);
-          setTimeout(() => createMlgElement('doritos'), 100);
+          setTimeout(() => createMlgElement('triple'), 100);
+          setTimeout(() => createMlgElement('doritos'), 200);
           setTimeout(() => playSound('applause'), 300);
           break;
           
