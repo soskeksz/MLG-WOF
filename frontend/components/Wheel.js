@@ -1,4 +1,4 @@
-// components/Wheel.js
+// components/Wheel.js 
 import React from 'react';
 import styles from '../styles/Wheel.module.css';
 
