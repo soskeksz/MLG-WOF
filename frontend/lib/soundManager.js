@@ -16,7 +16,8 @@ export class SoundManager {
             applause: '/sounds/applause.mp3',    
             ohmygod: '/sounds/ohmygod.mp3',
             damnson: '/sounds/damnson.mp3',
-            triple: '/sounds/triple.mp3'
+            triple: '/sounds/triple.mp3',
+            jackpot: '/sounds/jackpot.mp3'
         };
         
         // Preload sounds

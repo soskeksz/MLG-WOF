@@ -272,6 +272,7 @@ const spinWheel = async () => {
           createMlgElement('dew');
           setShowWow(true)
           setTimeout(() => createMlgElement('wow'), 500);
+          setTimeout(() => playSound('wow'), 560);
           break;
           
         case "LOSE":
@@ -464,10 +465,6 @@ const spinWheel = async () => {
         {showResult && (
           <div className={`${styles.result} ${styles[result.toLowerCase()]}`}>
             <h2>{result}</h2>
-            {/* Debug info to verify alignment */}
-            <div style={{fontSize: '0.8rem', color: 'yellow'}}>
-              Backend segment: {result}
-            </div>
           </div>
         )}
         
