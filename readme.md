@@ -526,37 +526,6 @@ const nextConfig = {
 - **Domain**: Custom domain supported
 - **CDN**: Automatic via Vercel Edge Network
 
-### Vercel Deployment
-```bash
-# Install Vercel CLI
-npm i -g vercel
-
-# Deploy to production
-vercel --prod
-
-# Set environment variables in Vercel dashboard:
-# MONGODB_URI=mongodb+srv://...
-# NODE_ENV=production
-```
-
-### Environment Variables (Production)
-```bash
-MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/wheel_of_fortune
-NODE_ENV=production
-```
-
-### Performance Optimizations
-- **Static Generation** for landing page
-- **API Route Optimization** with efficient queries
-- **Image Optimization** via Next.js Image component
-- **Bundle Analysis** to monitor build size
-
-### Monitoring
-- **Vercel Analytics** for performance metrics
-- **MongoDB Atlas Monitoring** for database performance
-- **Error Tracking** via console logging (extend with Sentry)
-
----
 
 ## 🧪 Testing
 
