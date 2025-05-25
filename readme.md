@@ -9,7 +9,7 @@
 
 ## 🚀 Live Demo
 
-**Production**: [Deployed on Vercel](your-vercel-url)  
+**Production**: [Deployed on Vercel](https://mlg-2t3ck92zp-zoltai-barnas-projects.vercel.app/)  
 **Local Development**: http://localhost:3000
 
 ---
@@ -69,7 +69,7 @@ This project demonstrates:
 
 ### 🔥 MLG Effects & Sound Design
 - **Hitmarker effects** - Visual feedback on interactive elements
-- **Sound library** - 10+ MLG-themed sound effects (airhorn, hitmarker, etc.)
+- **Sound library** - MLG-themed sound effects (airhorn, hitmarker, etc.)
 - **Dynamic animations** - Rainbow backgrounds, floating Doritos, Mountain Dew
 - **Themed outcomes** - Thomas the Tank Engine on special wins
 - **Memory-optimized effects** - Proper cleanup prevents memory leaks
