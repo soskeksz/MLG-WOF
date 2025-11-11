@@ -9,7 +9,7 @@
 
 ## 🚀 Live Demo
 
-**Production**: [Deployed on Vercel](https://mlg-2t3ck92zp-zoltai-barnas-projects.vercel.app/)  
+**Production**: [Deployed on Vercel](https://mlg-1zx899mky-zoltai-barnas-projects.vercel.app/)  
 **Local Development**: http://localhost:3000
 
 ---
